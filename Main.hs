@@ -35,7 +35,7 @@ listOfTuples :: [(Int, Char)]
 listOfTuples do
   n <- [1, 2]
   ch <- ['a', 'b']
-  return (n, ch)
+  return (n, ch)  
 
 main :: IO ()
 main = do
@@ -49,6 +49,7 @@ main = do
   print safe_map_result
 
   -- (>>=) :: (Monad m) => m a -> (a -> m b) -> m b  
+  -- (>>) :: (Monad m) => m a -> m b -> m b
 
   let safe_map_and_get_even_result = map' (\x -> x * x) [1, 2, 3] [] >>= getFirstEvenSafe
   print safe_map_and_get_even_result
