@@ -9,15 +9,21 @@ module Maybe = struct
 
   exception Invalid_argument of string
 
-  let return v = Just v
-
-  let ( >>= ) m f =
+  let then' f m =
     match m with
-    | Just v -> f v
     | Nothing -> raise (Invalid_argument "maybe is Nothing")
+    | Just v -> f v
   ;;
 
-  let ( >> ) _ m = m
+  let resolve v = Just v
+  
+  let ( >>= ) m f = then' f m
+
+  let print m =
+    match m with
+    | Just m -> Printf.printf "Just %s" m
+    | Nothing -> raise (Invalid_argument "maybe is Nothing")
+  ;;
 end
 
 open Maybe
@@ -49,4 +55,14 @@ let () =
   map (fun x -> x * 2) [ 1; 2; 3; 4 ] >>= print_list;
   map (fun x -> x * 2) [ 1; 2; 3; 4 ] >>= get_first_even_safe >>= print_int;
   map (fun x -> x * 2) [ 1; 2; 3; 4 ] >>= get_first_even_safe >>= print_int
+;;
+
+let () =
+  let monad =
+    resolve "abc"
+    |> then' (fun v -> resolve (v ^ "def"))
+    |> then' (fun v -> resolve (v ^ "ghi"))
+    |> then' (fun v -> resolve (v ^ "jkl"))
+  in
+  print monad
 ;;
