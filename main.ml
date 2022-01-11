@@ -50,14 +50,14 @@ let map f l =
   aux l []
 ;;
 
-let () =
+let a () =
   safe_tail [ 1; 2; 3; 4 ] >>= print_list;
   map (fun x -> x * 2) [ 1; 2; 3; 4 ] >>= print_list;
   map (fun x -> x * 2) [ 1; 2; 3; 4 ] >>= get_first_even_safe >>= print_int;
   map (fun x -> x * 2) [ 1; 2; 3; 4 ] >>= get_first_even_safe >>= print_int
 ;;
 
-let () =
+let b () =
   let monad =
     resolve "abc"
     |> then' (fun v -> resolve (v ^ "def"))
@@ -90,19 +90,17 @@ sig
     val empty : t
 end
 
-module type STATE_MONAD =
-functor(State: STATE) ->
+module type STATE_MONAD = functor(State: STATE) ->
 sig
     include MONAD
     val access : 'a t -> 'a
     val put    : State.t -> unit t
     val get    : State.t t
-    val eval   : 'a * 'b -> 'a 
-    val exec   : 'a * 'b -> 'b
+    (* val eval   : 'a * 'b -> 'a  *)
+    (* val exec   : 'a * 'b -> 'b *)
 end
 
-module STATEMONAD: STATE_MONAD = 
-functor(State : STATE) ->
+module State: STATE_MONAD = functor(State : STATE) ->
 struct
     type state = State.t
     type 'a t = state -> ('a * state)
@@ -113,13 +111,20 @@ struct
         | (x, _) -> x
     let put s = fun _ -> ((), s)
     let get = fun s -> (s, s)
+
     (* TODO *)
-    let eval = fun s -> fst s
-    let exec = fun s -> snd s
+    (* let eval = fun s -> fst s *)
+    (* let exec = fun s -> snd s *)
 end
 
+module IntState = State(
+  struct
+    type t = int
+    let empty = 0
+  end
+)
 
-
-
-
-
+let () = 
+  let state  = IntState.return 1 in 
+  let state' = IntState.bind state (fun i -> IntState.return (succ i)) in
+  print_endline (string_of_int (IntState.access state'))  
