@@ -23,3 +23,5 @@ CHANGELOG.md
 monads.cabal
 dist
 Setup.hs
+_build
+dune-project
