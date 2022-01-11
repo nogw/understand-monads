@@ -66,3 +66,14 @@ let () =
   in
   print monad
 ;;
+
+type state = Locked | Unlocked
+type output = Thank | Open | Tut
+
+let coin = function _ -> (Thank, Unlocked)
+
+let push state =
+  match state with 
+  | Locked -> (Tut, Locked) 
+  | Unlocked -> (Open, Locked)
+
